@@ -40,7 +40,8 @@ jobs:
           URL=$(echo "$RESULT" | cut -d'|' -f2); HIT=$(echo "$RESULT" | cut -d'|' -f3-)
           MSG="🚨 POHODA: Caravan parking ticket is available! Buy it now: $URL  ($HIT)"
           curl -s --max-time 20 -H "Title: POHODA: Caravan ticket available!" -H "Priority: urgent" \
-            -H "Tags: rotating_light,camping" -H "Click: $URL" -d "$MSG" "https://n          # WhatsApp via Meta WhatsApp Cloud API (template message; WA_TO may hold several numbers, comma-separated)
+            -H "Tags: rotating_light,camping" -H "Click: $URL" -d "$MSG" "https://ntfy.sh/$NTFY_TOPIC"
+          # WhatsApp via Meta WhatsApp Cloud API (template message; WA_TO may hold several numbers, comma-separated)
           if [ -n "$WA_TOKEN" ] && [ -n "$WA_TO" ]; then
             TPL="${WA_TEMPLATE:-hello_world}"; LANG_CODE="${WA_LANG:-en_US}"
             for to in ${WA_TO//,/ }; do
@@ -53,8 +54,6 @@ jobs:
               curl -s --max-time 20 -X POST "https://graph.facebook.com/v21.0/$WA_PHONE_NUMBER_ID/messages" \
                 -H "Authorization: Bearer $WA_TOKEN" -H "Content-Type: application/json" -d "$body"; echo
             done
-          fi
-TOKEN"
           fi
       - name: Stop after a real alert
         if: startsWith(steps.check.outputs.result, 'FOUND') && inputs.test_alert != true
