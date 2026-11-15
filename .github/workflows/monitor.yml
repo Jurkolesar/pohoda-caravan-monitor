@@ -8,6 +8,14 @@ on:
         description: "Send a test alert to all channels"
         type: boolean
         default: false
+      relay_url:
+        description: "Alert relayed from the Cloudflare monitor: shop URL"
+        type: string
+        default: ""
+      relay_hit:
+        description: "Alert relayed from the Cloudflare monitor: matched text"
+        type: string
+        default: ""
 permissions:
   actions: write
   contents: write
@@ -20,8 +28,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check shop
         id: check
+        env:
+          RELAY_URL: ${{ inputs.relay_url }}
+          RELAY_HIT: ${{ inputs.relay_hit }}
         run: |
-          if [ "${{ inputs.test_alert }}" = "true" ]; then
+          if [ -n "$RELAY_URL" ]; then
+            echo "result=FOUND|$RELAY_URL|$RELAY_HIT" >> "$GITHUB_OUTPUT"
+          elif [ "${{ inputs.test_alert }}" = "true" ]; then
             echo "result=FOUND|https://shop.pohodafestival.sk/sk/listky-2027|TEST ALERT - not real yet" >> "$GITHUB_OUTPUT"
           else
             echo "result=$(./check.sh)" >> "$GITHUB_OUTPUT"
